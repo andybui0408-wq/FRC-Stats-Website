@@ -1,0 +1,42 @@
+{
+  "name": "frc-scouting-dashboard",
+  "version": "1.0.0",
+  "description": "A comprehensive web application for FRC team scouting, data analysis, and alliance building",
+  "main": "index.html",
+  "scripts": {
+    "start": "python -m http.server 8000",
+    "serve": "python3 -m http.server 8000",
+    "dev": "live-server --port=8000 --open=/index.html"
+  },
+  "keywords": [
+    "frc",
+    "robotics",
+    "scouting",
+    "dashboard",
+    "alliance",
+    "data-analysis",
+    "first-robotics"
+  ],
+  "author": "FRC Scouting Team",
+  "license": "MIT",
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  },
+  "dependencies": {
+    "chart.js": "^3.9.1",
+    "xlsx": "^0.18.5"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/frc-scouting-dashboard.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/frc-scouting-dashboard/issues"
+  },
+  "homepage": "https://github.com/your-username/frc-scouting-dashboard#readme",
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
+}

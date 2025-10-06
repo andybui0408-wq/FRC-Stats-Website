@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FRC Scouting Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1><i class="fas fa-robot"></i> FRC Scouting Dashboard</h1>
+            <nav>
+                <ul>
+                    <li><a href="#dashboard" class="nav-link active">Dashboard</a></li>
+                    <li><a href="#teams" class="nav-link">Teams</a></li>
+                    <li><a href="#alliances" class="nav-link">Alliances</a></li>
+                    <li><a href="#data-import" class="nav-link">Data Import</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main">
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="section active">
+            <div class="container">
+                <h2>Dashboard Overview</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <i class="fas fa-users"></i>
+                        <h3>Total Teams</h3>
+                        <span class="stat-number" id="total-teams">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-trophy"></i>
+                        <h3>Top Rated Team</h3>
+                        <span class="stat-number" id="top-team">-</span>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-chart-line"></i>
+                        <h3>Avg Rating</h3>
+                        <span class="stat-number" id="avg-rating">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-database"></i>
+                        <h3>Data Points</h3>
+                        <span class="stat-number" id="data-points">0</span>
+                    </div>
+                </div>
+                
+                <div class="charts-container">
+                    <div class="chart-card">
+                        <h3>Team Performance Distribution</h3>
+                        <canvas id="performanceChart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Alliance Strength Analysis</h3>
+                        <canvas id="allianceChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Teams Section -->
+        <section id="teams" class="section">
+            <div class="container">
+                <h2>Team Analysis</h2>
+                <div class="controls">
+                    <input type="text" id="team-search" placeholder="Search teams..." class="search-input">
+                    <select id="sort-by" class="sort-select">
+                        <option value="rating">Sort by Rating</option>
+                        <option value="team-number">Sort by Team Number</option>
+                        <option value="matches">Sort by Matches</option>
+                    </select>
+                </div>
+                <div class="teams-table-container">
+                    <table class="teams-table">
+                        <thead>
+                            <tr>
+                                <th>Team #</th>
+                                <th>Name</th>
+                                <th>Rating</th>
+                                <th>Matches</th>
+                                <th>Avg Score</th>
+                                <th>Reliability</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="teams-tbody">
+                            <!-- Teams will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Alliances Section -->
+        <section id="alliances" class="section">
+            <div class="container">
+                <h2>Alliance Analysis</h2>
+                <div class="alliance-builder">
+                    <h3>Build Alliance</h3>
+                    <div class="alliance-inputs">
+                        <select id="team1-select" class="team-select">
+                            <option value="">Select Team 1</option>
+                        </select>
+                        <select id="team2-select" class="team-select">
+                            <option value="">Select Team 2</option>
+                        </select>
+                        <select id="team3-select" class="team-select">
+                            <option value="">Select Team 3</option>
+                        </select>
+                        <button id="calculate-alliance" class="btn btn-primary">Calculate Alliance Strength</button>
+                    </div>
+                    <div id="alliance-result" class="alliance-result"></div>
+                </div>
+                
+                <div class="alliance-rankings">
+                    <h3>Top Alliances</h3>
+                    <div id="alliance-rankings-list" class="rankings-list">
+                        <!-- Alliance rankings will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Data Import Section -->
+        <section id="data-import" class="section">
+            <div class="container">
+                <h2>Data Import</h2>
+                <div class="import-options">
+                    <div class="import-card">
+                        <h3><i class="fas fa-file-excel"></i> Excel Import</h3>
+                        <p>Upload Excel files with team data</p>
+                        <input type="file" id="excel-file" accept=".xlsx,.xls" class="file-input">
+                        <button id="import-excel" class="btn btn-secondary">Import Excel Data</button>
+                    </div>
+                    <div class="import-card">
+                        <h3><i class="fas fa-google"></i> Google Forms</h3>
+                        <p>Connect to Google Forms for real-time data</p>
+                        <input type="text" id="google-form-url" placeholder="Google Form URL" class="form-input">
+                        <button id="connect-google" class="btn btn-secondary">Connect to Google Forms</button>
+                    </div>
+                </div>
+                
+                <div class="data-preview">
+                    <h3>Data Preview</h3>
+                    <div id="data-preview-table" class="preview-table">
+                        <!-- Data preview will be shown here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 FRC Scouting Dashboard. Built for FRC Team Scouting.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
