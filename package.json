@@ -2,10 +2,10 @@
   "name": "frc-scouting-dashboard",
   "version": "1.0.0",
   "description": "A comprehensive web application for FRC team scouting, data analysis, and alliance building",
-  "main": "server.js",
+  "main": "backend/server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js",
+    "start": "node backend/server.js",
+    "dev": "nodemon backend/server.js",
     "build": "echo 'Build complete - static files ready'",
     "serve-static": "python3 -m http.server 8000"
   },

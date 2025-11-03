@@ -7,8 +7,8 @@ const fs = require('fs');
 const multer = require('multer');
 const XLSX = require('xlsx');
 
-const { Database } = require('../../src/db');
-const { buildAlliances } = require('../../src/logic');
+const { Database } = require('../../backend/src/db');
+const { buildAlliances } = require('../../backend/src/logic');
 
 const app = express();
 

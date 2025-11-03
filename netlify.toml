@@ -1,6 +1,6 @@
 [build]
   command = "npm install"
-  publish = "."
+  publish = "frontend"
   functions = "netlify/functions"
 
 [build.environment]
@@ -18,7 +18,6 @@
   from = "/*"
   to = "/index.html"
   status = 200
-  conditions = {Role = ["*"]}
 
 # Headers for security
 [[headers]]

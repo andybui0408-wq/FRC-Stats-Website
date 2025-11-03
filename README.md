@@ -105,19 +105,29 @@ For serverless deployment, you may need to convert the Express server to Netlify
 
 ```
 FRC-Stats-Website/
-├── index.html          # Main dashboard page
-├── login.html          # Authentication page
-├── server.js           # Express backend server
-├── styles.css          # SSIS-branded styles
-├── script.js           # Frontend JavaScript
-├── package.json        # Dependencies and scripts
-├── src/
-│   ├── db.js          # Database layer (lowdb)
-│   └── logic.js        # Alliance calculation logic
-├── data/               # JSON database files (gitignored)
-├── uploads/            # Temporary upload directory (gitignored)
+├── frontend/           # Frontend files (HTML, CSS, JS)
+│   ├── index.html
+│   ├── login.html
+│   ├── script.js
+│   └── styles.css
+├── backend/            # Backend server and logic
+│   ├── server.js
+│   └── src/
+│       ├── db.js
+│       └── logic.js
+├── netlify/            # Netlify Functions
+│   └── functions/
+│       └── server.js
+├── data/               # Data storage
+│   ├── frc.json
+│   └── samples/
+├── docs/               # Documentation
+├── scripts/            # Utility scripts
+├── uploads/            # Temporary uploads (gitignored)
 └── README.md           # This file
 ```
+
+See `PROJECT_STRUCTURE.md` for detailed documentation.
 
 ## API Endpoints
 
