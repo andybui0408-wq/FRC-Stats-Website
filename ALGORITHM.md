@@ -12,7 +12,7 @@ The team rating is calculated using a weighted combination of multiple factors:
 Rating = (AvgScore × 0.4) + (Reliability × 100 × 0.3) + (MatchCount × 0.2) + (Consistency × 0.1)
 ```
 
-### Factors Explained
+### Fact[text](about:blank#blocked)ors Explained
 
 #### 1. Average Score (40% weight)
 - Raw average score from matches

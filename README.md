@@ -1,128 +1,219 @@
-# FRC Scouting Dashboard
+# SSIS FRC Scouting Dashboard
 
-A comprehensive web application for FRC (First Robotics Competition) team scouting, data analysis, and alliance building.
+A comprehensive full-stack web application for FRC (First Robotics Competition) team scouting, data analysis, and alliance building - exclusively for Saigon South International School (SSIS) students and staff.
 
 ## Features
 
-### 📊 Dashboard
+### 🔐 **SSIS-Exclusive Access**
+- Email-based authentication restricted to `@ssis.edu.vn` domain
+- Secure session management
+- Automatic user creation on first login
+
+### 📊 **Dashboard**
 - Real-time statistics overview
 - Team performance distribution charts
 - Alliance strength analysis
 - Key metrics display
 
-### 👥 Team Analysis
+### 👥 **Team Analysis**
 - Comprehensive team database
 - Search and filter functionality
 - Team rating system
 - Performance metrics tracking
 - Match history and reliability scores
 
-### 🤝 Alliance Building
+### 🤝 **Alliance Building**
 - Interactive alliance builder
 - Real-time alliance strength calculation
 - Top alliance rankings
 - Synergy analysis between teams
 
-### 📈 Data Management
-- Excel file import (.xlsx, .xls)
-- Google Forms integration (demo)
+### 📝 **Data Collection**
+- Embedded Google Form for scouting data submission
+- Direct integration with Google Forms
+- Automatic data collection
+
+### 📈 **Data Management**
+- Excel/CSV file import (.xlsx, .xls, .csv)
 - Data preview and validation
-- Export capabilities
+- Real-time updates
 
 ## Getting Started
 
 ### Prerequisites
+- Node.js 18+ installed
 - Modern web browser (Chrome, Firefox, Safari, Edge)
-- No server setup required - runs entirely in the browser
+- SSIS email address (`@ssis.edu.vn`)
 
 ### Installation
-1. Clone or download this repository
-2. Open `index.html` in your web browser
-3. Start importing team data or use the sample data
 
-### Usage
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/andybui0408-wq/FRC-Stats-Website.git
+   cd FRC-Stats-Website
+   ```
 
-#### Importing Data
-1. Navigate to the "Data Import" section
-2. Upload Excel files with team data
-3. Or connect to Google Forms for real-time data collection
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-#### Team Analysis
-1. Go to the "Teams" section
-2. Use search to find specific teams
-3. Sort by rating, team number, or matches
-4. Click "View" for detailed team information
+3. **Start the development server**
+   ```bash
+   npm run dev
+   ```
 
-#### Building Alliances
-1. Navigate to the "Alliances" section
-2. Select three teams from the dropdown menus
-3. Click "Calculate Alliance Strength"
-4. View top alliance rankings
+4. **Access the application**
+   - Open your browser to `http://localhost:3000`
+   - You'll be redirected to login page
+   - Sign in with your `@ssis.edu.vn` email address
+
+### First-Time Login
+
+1. Navigate to the login page
+2. Enter your SSIS email address (e.g., `your.name@ssis.edu.vn`)
+3. Click "Sign In / Sign Up"
+4. You'll be automatically registered and logged in
+5. Access the full dashboard
+
+## Deployment on Netlify
+
+### Setup
+
+1. **Push to GitHub** (already configured)
+   ```bash
+   git add .
+   git commit -m "Your commit message"
+   git push origin main
+   ```
+
+2. **Configure Netlify**
+   - Connect your GitHub repository to Netlify
+   - Build command: `npm install`
+   - Publish directory: `.` (root)
+   - Start command: `npm start`
+
+3. **Environment Variables** (optional)
+   - `PORT`: Server port (default: 3000)
+   - Set up in Netlify dashboard: Site settings → Environment variables
+
+### Netlify Functions (Alternative)
+
+For serverless deployment, you may need to convert the Express server to Netlify Functions. The current setup uses Express.js which works on Netlify with proper configuration.
+
+## Project Structure
+
+```
+FRC-Stats-Website/
+├── index.html          # Main dashboard page
+├── login.html          # Authentication page
+├── server.js           # Express backend server
+├── styles.css          # SSIS-branded styles
+├── script.js           # Frontend JavaScript
+├── package.json        # Dependencies and scripts
+├── src/
+│   ├── db.js          # Database layer (lowdb)
+│   └── logic.js        # Alliance calculation logic
+├── data/               # JSON database files (gitignored)
+├── uploads/            # Temporary upload directory (gitignored)
+└── README.md           # This file
+```
+
+## API Endpoints
+
+### Authentication
+- `POST /api/auth/login` - Login with SSIS email
+- `POST /api/auth/signup` - Sign up with SSIS email
+- `POST /api/auth/logout` - Logout
+- `GET /api/auth/me` - Get current user
+
+### Teams
+- `GET /api/teams` - List all teams
+- `POST /api/teams` - Create/update team
+
+### Matches
+- `GET /api/matches` - List matches
+- `POST /api/matches` - Create match
+
+### Statistics
+- `GET /api/stats/overview` - Dashboard statistics
+
+### Alliances
+- `GET /api/alliances/top?limit=10` - Top alliances
+- `POST /api/alliances/calc` - Calculate alliance strength
+
+### Import
+- `POST /api/import/file` - Import Excel/CSV file
 
 ## Data Format
 
-### Excel Import Format
+### Excel/CSV Import Format
+
 Your Excel files should include columns for:
-- Team Number
-- Team Name
-- Rating
-- Matches Played
-- Average Score
-- Reliability
-- Auto Points
-- Teleop Points
-- Endgame Points
+- **Team Number** (required)
+- **Team Name**
+- **Rating**
+- **Matches Played**
+- **Average Score**
+- **Reliability**
+- **Auto Points**
+- **Teleop Points**
+- **Endgame Points**
 
 ### Google Forms Integration
-Set up Google Forms with fields matching your data structure. The system will automatically process responses and update the dashboard.
+
+The embedded Google Form automatically collects scouting data. Ensure your form fields match the expected data structure for seamless integration.
 
 ## Algorithm Details
 
 ### Team Rating System
 Teams are rated based on:
-- Average match performance
-- Consistency (reliability)
-- Match count
-- Performance trends
+- Average match performance (40% weight)
+- Consistency/reliability (30% weight)
+- Match count (20% weight)
+- Performance trends (10% weight)
 
 ### Alliance Strength Calculation
-Alliance strength is calculated using:
+Alliance strength considers:
 - Combined team ratings
 - Reliability bonuses
 - Synergy analysis
-- Complementary strengths
+- Complementary strengths across match phases
 
-## Customization
+See `ALGORITHM.md` for detailed documentation.
 
-### Adding New Metrics
-1. Update the team data structure in `script.js`
-2. Add corresponding columns to the teams table
-3. Update the alliance calculation algorithm
+## SSIS Branding
 
-### Styling
-- Modify `styles.css` for visual customization
-- Update color schemes and layouts
-- Add team-specific branding
+The application uses SSIS brand colors and styling:
+- **Primary Color**: Navy Blue (#003366)
+- **Secondary Color**: Blue (#004d99)
+- **Font**: Open Sans
+- **Design**: Clean, professional, modern
 
-## Browser Compatibility
-- Chrome 60+
-- Firefox 55+
-- Safari 12+
-- Edge 79+
+## Security
+
+- **Email Domain Restriction**: Only `@ssis.edu.vn` emails can access the system
+- **Session Management**: Secure session tokens with expiration
+- **Database**: JSON-based storage (can be upgraded to PostgreSQL/MySQL for production)
 
 ## Contributing
+
 1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ## License
-This project is open source and available under the MIT License.
+
+This project is proprietary and intended exclusively for SSIS FRC Team use.
 
 ## Support
-For questions or support, please contact the development team or create an issue in the repository.
+
+For questions or support, contact the SSIS FRC Team or create an issue in the repository.
 
 ---
 
-Built with ❤️ for FRC teams worldwide
+**Built with ❤️ for SSIS FRC Team**
+
+© 2024 Saigon South International School

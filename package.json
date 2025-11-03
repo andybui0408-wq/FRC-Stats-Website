@@ -2,11 +2,12 @@
   "name": "frc-scouting-dashboard",
   "version": "1.0.0",
   "description": "A comprehensive web application for FRC team scouting, data analysis, and alliance building",
-  "main": "index.html",
+  "main": "server.js",
   "scripts": {
-    "start": "python -m http.server 8000",
-    "serve": "python3 -m http.server 8000",
-    "dev": "live-server --port=8000 --open=/index.html"
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "build": "echo 'Build complete - static files ready'",
+    "serve-static": "python3 -m http.server 8000"
   },
   "keywords": [
     "frc",
@@ -20,15 +21,21 @@
   "author": "FRC Scouting Team",
   "license": "MIT",
   "devDependencies": {
-    "live-server": "^1.2.2"
+    "nodemon": "^3.1.0"
   },
   "dependencies": {
     "chart.js": "^3.9.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "lowdb": "^7.0.1",
+    "multer": "^1.4.5-lts.1",
+    "nanoid": "^5.0.7",
     "xlsx": "^0.18.5"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-username/frc-scouting-dashboard.git"
+    "url": "https://github.com/andybui0408-wq/FRC-Stats-Website.git"
   },
   "bugs": {
     "url": "https://github.com/your-username/frc-scouting-dashboard/issues"

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSIS FRC Scouting - Login</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #003366 0%, #004d99 100%);
+        }
+        .login-card {
+            background: white;
+            padding: 3rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            max-width: 400px;
+            width: 100%;
+        }
+        .login-card h1 {
+            color: #003366;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+        .login-card p {
+            color: #666;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 600;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #003366;
+        }
+        .error-message {
+            color: #dc3545;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+        .btn-login {
+            width: 100%;
+            padding: 1rem;
+            background-color: #003366;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .btn-login:hover {
+            background-color: #004d99;
+        }
+        .ssis-logo {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .ssis-logo img {
+            max-width: 150px;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="ssis-logo">
+                <h1 style="color: #003366; margin: 0;">SSIS</h1>
+                <p style="color: #666; margin-top: 0.5rem;">FRC Scouting Dashboard</p>
+            </div>
+            <h1>Welcome Back</h1>
+            <p>Please sign in with your SSIS email</p>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="email">SSIS Email Address</label>
+                    <input type="email" id="email" name="email" placeholder="your.name@ssis.edu.vn" required>
+                    <div id="error-message" class="error-message" style="display: none;"></div>
+                </div>
+                <button type="submit" class="btn-login">Sign In / Sign Up</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const errorDiv = document.getElementById('error-message');
+            
+            if (!email.endsWith('@ssis.edu.vn')) {
+                errorDiv.textContent = 'Only @ssis.edu.vn email addresses are allowed';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            try {
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+                
+                const data = await res.json();
+                
+                if (!res.ok) {
+                    errorDiv.textContent = data.error || 'Login failed';
+                    errorDiv.style.display = 'block';
+                    return;
+                }
+                
+                // Store session
+                localStorage.setItem('sessionId', data.sessionId);
+                localStorage.setItem('user', JSON.stringify(data.user));
+                
+                // Redirect to main app
+                window.location.href = '/index.html';
+            } catch (error) {
+                errorDiv.textContent = 'Connection error. Please try again.';
+                errorDiv.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

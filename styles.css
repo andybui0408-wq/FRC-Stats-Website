@@ -1,3 +1,13 @@
+/* SSIS Brand Colors */
+:root {
+    --ssis-navy: #003366;
+    --ssis-blue: #004d99;
+    --ssis-light-blue: #0066cc;
+    --ssis-gray: #666666;
+    --ssis-light-gray: #f5f5f5;
+    --ssis-white: #ffffff;
+}
+
 /* Reset and Base Styles */
 * {
     margin: 0;
@@ -6,10 +16,10 @@
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Open Sans', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     line-height: 1.6;
     color: #333;
-    background-color: #f5f5f5;
+    background-color: var(--ssis-light-gray);
 }
 
 .container {
@@ -20,10 +30,10 @@ body {
 
 /* Header Styles */
 .header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, var(--ssis-navy) 0%, var(--ssis-blue) 100%);
     color: white;
     padding: 1rem 0;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.15);
 }
 
 .header .container {
@@ -31,22 +41,50 @@ body {
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
+    gap: 1rem;
 }
 
-.header h1 {
-    font-size: 2rem;
+.header-left h1 {
+    font-size: 1.8rem;
     font-weight: 700;
+    margin: 0;
 }
 
-.header h1 i {
+.header-left h1 i {
     margin-right: 10px;
     color: #ffd700;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.user-info {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+.btn-logout {
+    padding: 0.5rem 1rem;
+    background: rgba(255,255,255,0.2);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn-logout:hover {
+    background: rgba(255,255,255,0.3);
 }
 
 nav ul {
     display: flex;
     list-style: none;
-    gap: 2rem;
+    gap: 1.5rem;
+    flex-wrap: wrap;
 }
 
 .nav-link {
@@ -55,6 +93,7 @@ nav ul {
     padding: 0.5rem 1rem;
     border-radius: 5px;
     transition: background-color 0.3s;
+    font-weight: 500;
 }
 
 .nav-link:hover,
@@ -76,6 +115,12 @@ nav ul {
     display: block;
 }
 
+.section h2 {
+    color: var(--ssis-navy);
+    margin-bottom: 1.5rem;
+    font-size: 2rem;
+}
+
 /* Stats Grid */
 .stats-grid {
     display: grid;
@@ -90,29 +135,32 @@ nav ul {
     border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     text-align: center;
-    transition: transform 0.3s;
+    transition: transform 0.3s, box-shadow 0.3s;
+    border-top: 4px solid var(--ssis-navy);
 }
 
 .stat-card:hover {
     transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
 }
 
 .stat-card i {
     font-size: 2.5rem;
-    color: #667eea;
+    color: var(--ssis-navy);
     margin-bottom: 1rem;
 }
 
 .stat-card h3 {
     font-size: 1.1rem;
     margin-bottom: 0.5rem;
-    color: #666;
+    color: var(--ssis-gray);
+    font-weight: 600;
 }
 
 .stat-number {
     font-size: 2.5rem;
     font-weight: bold;
-    color: #333;
+    color: var(--ssis-navy);
 }
 
 /* Charts Container */
@@ -132,7 +180,8 @@ nav ul {
 
 .chart-card h3 {
     margin-bottom: 1rem;
-    color: #333;
+    color: var(--ssis-navy);
+    font-weight: 600;
 }
 
 /* Controls */
@@ -152,6 +201,14 @@ nav ul {
     font-size: 1rem;
     flex: 1;
     min-width: 200px;
+    font-family: 'Open Sans', sans-serif;
+}
+
+.search-input:focus,
+.sort-select:focus,
+.form-input:focus {
+    outline: none;
+    border-color: var(--ssis-navy);
 }
 
 /* Tables */
@@ -175,9 +232,9 @@ nav ul {
 }
 
 .teams-table th {
-    background-color: #f8f9fa;
+    background-color: var(--ssis-light-gray);
     font-weight: 600;
-    color: #333;
+    color: var(--ssis-navy);
 }
 
 .teams-table tr:hover {
@@ -208,18 +265,25 @@ nav ul {
     font-size: 1rem;
     flex: 1;
     min-width: 150px;
+    font-family: 'Open Sans', sans-serif;
 }
 
 .alliance-result {
-    background: #f8f9fa;
+    background: var(--ssis-light-gray);
     padding: 1rem;
     border-radius: 5px;
     margin-top: 1rem;
     display: none;
+    border-left: 4px solid var(--ssis-navy);
 }
 
 .alliance-result.show {
     display: block;
+}
+
+.alliance-result h4 {
+    color: var(--ssis-navy);
+    margin-bottom: 0.5rem;
 }
 
 /* Alliance Rankings */
@@ -241,19 +305,40 @@ nav ul {
     justify-content: space-between;
     align-items: center;
     padding: 1rem;
-    background: #f8f9fa;
+    background: var(--ssis-light-gray);
     border-radius: 5px;
-    border-left: 4px solid #667eea;
+    border-left: 4px solid var(--ssis-navy);
 }
 
 .ranking-item .teams {
     font-weight: 600;
+    color: var(--ssis-navy);
 }
 
 .ranking-item .score {
     font-size: 1.2rem;
     font-weight: bold;
-    color: #667eea;
+    color: var(--ssis-navy);
+}
+
+/* Data Collection Form */
+.form-container {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.form-description {
+    color: var(--ssis-gray);
+    margin-bottom: 1.5rem;
+    font-size: 1.1rem;
+}
+
+.google-form-wrapper {
+    width: 100%;
+    overflow: hidden;
+    border-radius: 10px;
 }
 
 /* Import Options */
@@ -274,16 +359,17 @@ nav ul {
 
 .import-card h3 {
     margin-bottom: 1rem;
-    color: #333;
+    color: var(--ssis-navy);
+    font-weight: 600;
 }
 
 .import-card h3 i {
     margin-right: 10px;
-    color: #667eea;
+    color: var(--ssis-navy);
 }
 
 .import-card p {
-    color: #666;
+    color: var(--ssis-gray);
     margin-bottom: 1.5rem;
 }
 
@@ -302,42 +388,26 @@ nav ul {
     transition: background-color 0.3s;
     text-decoration: none;
     display: inline-block;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 600;
 }
 
 .btn-primary {
-    background-color: #667eea;
+    background-color: var(--ssis-navy);
     color: white;
 }
 
 .btn-primary:hover {
-    background-color: #5a6fd8;
+    background-color: var(--ssis-blue);
 }
 
 .btn-secondary {
-    background-color: #6c757d;
+    background-color: var(--ssis-gray);
     color: white;
 }
 
 .btn-secondary:hover {
-    background-color: #5a6268;
-}
-
-.btn-success {
-    background-color: #28a745;
-    color: white;
-}
-
-.btn-success:hover {
-    background-color: #218838;
-}
-
-.btn-danger {
-    background-color: #dc3545;
-    color: white;
-}
-
-.btn-danger:hover {
-    background-color: #c82333;
+    background-color: #555;
 }
 
 /* Data Preview */
@@ -366,16 +436,17 @@ nav ul {
 }
 
 .preview-table th {
-    background-color: #f8f9fa;
+    background-color: var(--ssis-light-gray);
     font-weight: 600;
+    color: var(--ssis-navy);
 }
 
 /* Footer */
 .footer {
-    background-color: #333;
+    background-color: var(--ssis-navy);
     color: white;
     text-align: center;
-    padding: 1rem 0;
+    padding: 1.5rem 0;
     margin-top: 2rem;
 }
 
@@ -389,6 +460,7 @@ nav ul {
     nav ul {
         flex-direction: column;
         gap: 0.5rem;
+        width: 100%;
     }
     
     .stats-grid {
@@ -414,6 +486,10 @@ nav ul {
     .teams-table-container {
         overflow-x: auto;
     }
+
+    .google-form-wrapper iframe {
+        height: 2000px;
+    }
 }
 
 /* Loading States */
@@ -424,7 +500,7 @@ nav ul {
 
 .spinner {
     border: 4px solid #f3f3f3;
-    border-top: 4px solid #667eea;
+    border-top: 4px solid var(--ssis-navy);
     border-radius: 50%;
     width: 40px;
     height: 40px;
@@ -436,16 +512,6 @@ nav ul {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
-
-/* Utility Classes */
-.text-center { text-align: center; }
-.text-right { text-align: right; }
-.mb-1 { margin-bottom: 0.5rem; }
-.mb-2 { margin-bottom: 1rem; }
-.mb-3 { margin-bottom: 1.5rem; }
-.mt-1 { margin-top: 0.5rem; }
-.mt-2 { margin-top: 1rem; }
-.mt-3 { margin-top: 1.5rem; }
 
 /* Team Rating Colors */
 .rating-excellent { color: #28a745; font-weight: bold; }

@@ -5,13 +5,71 @@ class FRCScoutingDashboard {
         this.teams = [];
         this.alliances = [];
         this.charts = {};
+        this.sessionId = localStorage.getItem('sessionId');
+        this.user = JSON.parse(localStorage.getItem('user') || 'null');
         this.init();
     }
 
-    init() {
+    async init() {
+        // Check authentication first
+        if (!await this.checkAuth()) {
+            window.location.href = '/login.html';
+            return;
+        }
+
         this.setupEventListeners();
-        this.loadSampleData();
+        this.setupAuthUI();
+        await this.bootstrapFromBackend();
         this.updateDashboard();
+    }
+
+    async checkAuth() {
+        if (!this.sessionId) return false;
+        
+        try {
+            const res = await fetch('/api/auth/me', {
+                headers: { 'x-session-id': this.sessionId }
+            });
+            
+            if (res.ok) {
+                const data = await res.json();
+                if (data.user) {
+                    this.user = data.user;
+                    return true;
+                }
+            }
+        } catch (e) {
+            console.error('Auth check failed:', e);
+        }
+        
+        // Clear invalid session
+        localStorage.removeItem('sessionId');
+        localStorage.removeItem('user');
+        return false;
+    }
+
+    setupAuthUI() {
+        if (this.user && this.user.email) {
+            const userEmailEl = document.getElementById('user-email');
+            const logoutBtn = document.getElementById('logout-btn');
+            if (userEmailEl) userEmailEl.textContent = this.user.email;
+            if (logoutBtn) {
+                logoutBtn.style.display = 'block';
+                logoutBtn.addEventListener('click', () => this.logout());
+            }
+        }
+    }
+
+    async logout() {
+        if (this.sessionId) {
+            await fetch('/api/auth/logout', {
+                method: 'POST',
+                headers: { 'x-session-id': this.sessionId }
+            });
+        }
+        localStorage.removeItem('sessionId');
+        localStorage.removeItem('user');
+        window.location.href = '/login.html';
     }
 
     setupEventListeners() {
@@ -38,13 +96,12 @@ class FRCScoutingDashboard {
         });
 
         // Data import
-        document.getElementById('import-excel').addEventListener('click', () => {
-            this.importExcelData();
-        });
-
-        document.getElementById('connect-google').addEventListener('click', () => {
-            this.connectGoogleForms();
-        });
+        const importExcelBtn = document.getElementById('import-excel');
+        if (importExcelBtn) {
+            importExcelBtn.addEventListener('click', () => {
+                this.importExcelData();
+            });
+        }
 
         // File input change
         document.getElementById('excel-file').addEventListener('change', (e) => {
@@ -77,22 +134,33 @@ class FRCScoutingDashboard {
         }
     }
 
-    loadSampleData() {
-        // Sample team data
-        this.teams = [
-            { teamNumber: 254, name: "The Cheesy Poofs", rating: 95, matches: 12, avgScore: 85, reliability: 0.92, auto: 15, teleop: 65, endgame: 5 },
-            { teamNumber: 118, name: "Robonauts", rating: 88, matches: 12, avgScore: 78, reliability: 0.89, auto: 12, teleop: 58, endgame: 8 },
-            { teamNumber: 1678, name: "Citrus Circuits", rating: 92, matches: 12, avgScore: 82, reliability: 0.91, auto: 14, teleop: 60, endgame: 8 },
-            { teamNumber: 2056, name: "OP Robotics", rating: 85, matches: 12, avgScore: 75, reliability: 0.87, auto: 10, teleop: 55, endgame: 10 },
-            { teamNumber: 2910, name: "Jack in the Bot", rating: 82, matches: 12, avgScore: 72, reliability: 0.85, auto: 8, teleop: 52, endgame: 12 },
-            { teamNumber: 3003, name: "Team 3003", rating: 78, matches: 12, avgScore: 68, reliability: 0.83, auto: 6, teleop: 48, endgame: 14 },
-            { teamNumber: 4003, name: "Team 4003", rating: 90, matches: 12, avgScore: 80, reliability: 0.90, auto: 13, teleop: 59, endgame: 8 },
-            { teamNumber: 5003, name: "Team 5003", rating: 75, matches: 12, avgScore: 65, reliability: 0.80, auto: 5, teleop: 45, endgame: 15 }
-        ];
-
+    async bootstrapFromBackend() {
+        try {
+            const res = await fetch('/api/teams', {
+                headers: { 'x-session-id': this.sessionId }
+            });
+            if (res.ok) {
+                this.teams = await res.json();
+            } else {
+                this.teams = [];
+            }
+        } catch (e) {
+            this.teams = [];
+        }
+        if (this.teams.length === 0) {
+            // fallback: seed backend with sample CSV packaged in repo
+            // keep UI usable with static defaults until data is uploaded
+            this.teams = [
+                { teamNumber: 254, name: "The Cheesy Poofs", rating: 95, matches: 12, avgScore: 85, reliability: 0.92, auto: 15, teleop: 65, endgame: 5 },
+                { teamNumber: 118, name: "Robonauts", rating: 88, matches: 12, avgScore: 78, reliability: 0.89, auto: 12, teleop: 58, endgame: 8 },
+                { teamNumber: 1678, name: "Citrus Circuits", rating: 92, matches: 12, avgScore: 82, reliability: 0.91, auto: 14, teleop: 60, endgame: 8 }
+            ];
+        }
         this.updateTeamsTable();
         this.updateTeamSelects();
         this.calculateAllianceRankings();
+        this.updateDashboard();
+        this.updateCharts();
     }
 
     updateDashboard() {
@@ -406,26 +474,28 @@ class FRCScoutingDashboard {
         container.innerHTML = tableHTML;
     }
 
-    importExcelData() {
+    async importExcelData() {
         const fileInput = document.getElementById('excel-file');
         if (fileInput.files.length === 0) {
-            alert('Please select an Excel file first.');
+            alert('Please select a file first.');
             return;
         }
-        
-        this.processExcelFile(fileInput.files[0]);
-        alert('Excel data imported successfully! (This is a demo - data would be processed and added to the database)');
-    }
-
-    connectGoogleForms() {
-        const url = document.getElementById('google-form-url').value;
-        if (!url) {
-            alert('Please enter a Google Forms URL.');
+        const file = fileInput.files[0];
+        const form = new FormData();
+        form.append('file', file);
+        const res = await fetch('/api/import/file', { 
+            method: 'POST', 
+            headers: { 'x-session-id': this.sessionId },
+            body: form 
+        });
+        if (!res.ok) {
+            alert('Import failed.');
             return;
         }
-        
-        // In a real implementation, this would connect to Google Forms API
-        alert('Google Forms connection initiated! (This is a demo - would connect to Google Forms API)');
+        const result = await res.json();
+        alert(`Imported ${result.inserted} rows.`);
+        // refresh teams from backend
+        await this.bootstrapFromBackend();
     }
 
     viewTeamDetails(teamNumber) {

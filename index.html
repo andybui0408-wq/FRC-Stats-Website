@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FRC Scouting Dashboard</title>
+    <title>SSIS FRC Scouting Dashboard</title>
     <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
@@ -12,15 +13,22 @@
 <body>
     <header class="header">
         <div class="container">
-            <h1><i class="fas fa-robot"></i> FRC Scouting Dashboard</h1>
+            <div class="header-left">
+                <h1><i class="fas fa-robot"></i> SSIS FRC Scouting</h1>
+            </div>
             <nav>
                 <ul>
                     <li><a href="#dashboard" class="nav-link active">Dashboard</a></li>
                     <li><a href="#teams" class="nav-link">Teams</a></li>
                     <li><a href="#alliances" class="nav-link">Alliances</a></li>
-                    <li><a href="#data-import" class="nav-link">Data Import</a></li>
+                    <li><a href="#data-collection" class="nav-link">Data Collection</a></li>
+                    <li><a href="#data-import" class="nav-link">Import Data</a></li>
                 </ul>
             </nav>
+            <div class="header-right">
+                <span id="user-email" class="user-info"></span>
+                <button id="logout-btn" class="btn-logout" style="display: none;">Logout</button>
+            </div>
         </div>
     </header>
 
@@ -128,22 +136,40 @@
             </div>
         </section>
 
+        <!-- Data Collection Section (Google Form) -->
+        <section id="data-collection" class="section">
+            <div class="container">
+                <h2>Data Collection Form</h2>
+                <div class="form-container">
+                    <p class="form-description">
+                        Use the form below to submit scouting data. All submissions are automatically collected and processed.
+                    </p>
+                    <div class="google-form-wrapper">
+                        <iframe 
+                            src="https://docs.google.com/forms/d/e/1FAIpQLSczaNgO_1h63pKAsweegQ11QEd4zhfpaN7xvx4_Kr_-jzNEdA/viewform?embedded=true" 
+                            width="100%" 
+                            height="3104" 
+                            frameborder="0" 
+                            marginheight="0" 
+                            marginwidth="0"
+                            style="border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                            Loading…
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- Data Import Section -->
         <section id="data-import" class="section">
             <div class="container">
-                <h2>Data Import</h2>
+                <h2>Import Data</h2>
                 <div class="import-options">
                     <div class="import-card">
                         <h3><i class="fas fa-file-excel"></i> Excel Import</h3>
-                        <p>Upload Excel files with team data</p>
-                        <input type="file" id="excel-file" accept=".xlsx,.xls" class="file-input">
-                        <button id="import-excel" class="btn btn-secondary">Import Excel Data</button>
-                    </div>
-                    <div class="import-card">
-                        <h3><i class="fas fa-google"></i> Google Forms</h3>
-                        <p>Connect to Google Forms for real-time data</p>
-                        <input type="text" id="google-form-url" placeholder="Google Form URL" class="form-input">
-                        <button id="connect-google" class="btn btn-secondary">Connect to Google Forms</button>
+                        <p>Upload Excel or CSV files with team data</p>
+                        <input type="file" id="excel-file" accept=".xlsx,.xls,.csv" class="file-input">
+                        <button id="import-excel" class="btn btn-primary">Import Excel Data</button>
                     </div>
                 </div>
                 
@@ -159,7 +185,7 @@
 
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2024 FRC Scouting Dashboard. Built for FRC Team Scouting.</p>
+            <p>&copy; 2024 SSIS FRC Scouting Dashboard. Built for Saigon South International School FRC Team.</p>
         </div>
     </footer>
 
