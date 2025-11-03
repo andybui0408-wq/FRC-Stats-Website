@@ -6,14 +6,16 @@
 [build.environment]
   NODE_VERSION = "18"
 
-# Redirect API calls to serverless function (this is the correct pattern)
+# Redirect API calls to serverless function
+# This must come FIRST before any other redirects
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/server"
   status = 200
   force = true
 
-# SPA routing - serve index.html for all non-API routes
+# SPA routing - serve index.html for all routes except API
+# This catch-all comes AFTER the API redirect
 [[redirects]]
   from = "/*"
   to = "/index.html"
@@ -34,3 +36,4 @@
   [headers.values]
     Access-Control-Allow-Origin = "*"
     Access-Control-Allow-Headers = "Content-Type, x-session-id"
+    Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
