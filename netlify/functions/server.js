@@ -7,6 +7,7 @@ const fs = require('fs');
 const multer = require('multer');
 const XLSX = require('xlsx');
 
+// Import backend modules
 const { Database } = require('../../backend/src/db');
 const { buildAlliances } = require('../../backend/src/logic');
 
@@ -39,21 +40,24 @@ async function ensureDbInitialized() {
       dbInitialized = true;
     } catch (error) {
       console.error('Database initialization error:', error);
+      throw error;
     }
   }
 }
 
-// Initialize on module load
-ensureDbInitialized();
-
 // Session middleware
-app.use((req, res, next) => {
-  const sessionId = req.headers['x-session-id'] || req.cookies?.sessionId;
-  if (sessionId) {
-    const session = db.getSession(sessionId);
-    if (session) {
-      req.userId = session.userId;
+app.use(async (req, res, next) => {
+  try {
+    await ensureDbInitialized();
+    const sessionId = req.headers['x-session-id'] || req.cookies?.sessionId;
+    if (sessionId) {
+      const session = db.getSession(sessionId);
+      if (session) {
+        req.userId = session.userId;
+      }
     }
+  } catch (error) {
+    console.error('Session middleware error:', error);
   }
   next();
 });
@@ -69,30 +73,42 @@ const requireAuth = (req, res, next) => {
 // Multer for uploads
 const upload = multer({ dest: UPLOADS_DIR });
 
-// Health
-app.get('/api/health', (req, res) => {
-  res.json({ ok: true, version: '1.0.0' });
+// Health check
+app.get('/api/health', async (req, res) => {
+  try {
+    await ensureDbInitialized();
+    res.json({ ok: true, version: '1.0.0' });
+  } catch (error) {
+    res.status(500).json({ error: 'Database not initialized', message: error.message });
+  }
 });
 
 // Auth endpoints
 app.post('/api/auth/signup', async (req, res) => {
-  const { email, name } = req.body;
-  
-  if (!email || !email.endsWith('@ssis.edu.vn')) {
-    return res.status(400).json({ error: 'Only @ssis.edu.vn email addresses are allowed' });
+  try {
+    await ensureDbInitialized();
+    const { email, name } = req.body;
+    
+    if (!email || !email.endsWith('@ssis.edu.vn')) {
+      return res.status(400).json({ error: 'Only @ssis.edu.vn email addresses are allowed' });
+    }
+    
+    const user = db.createUser(email, name || '');
+    if (!user) {
+      return res.status(400).json({ error: 'User already exists' });
+    }
+    
+    const session = db.createSession(user.id);
+    res.json({ user, sessionId: session.id });
+  } catch (error) {
+    console.error('Signup error:', error);
+    res.status(500).json({ error: 'Internal server error: ' + error.message });
   }
-  
-  const user = db.createUser(email, name || '');
-  if (!user) {
-    return res.status(400).json({ error: 'User already exists' });
-  }
-  
-  const session = db.createSession(user.id);
-  res.json({ user, sessionId: session.id });
 });
 
 app.post('/api/auth/login', async (req, res) => {
   try {
+    await ensureDbInitialized();
     const { email } = req.body;
     
     if (!email || !email.endsWith('@ssis.edu.vn')) {
@@ -122,70 +138,125 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
-app.post('/api/auth/logout', (req, res) => {
-  const sessionId = req.headers['x-session-id'] || req.cookies?.sessionId;
-  if (sessionId) {
-    db.deleteSession(sessionId);
+app.post('/api/auth/logout', async (req, res) => {
+  try {
+    await ensureDbInitialized();
+    const sessionId = req.headers['x-session-id'] || req.cookies?.sessionId;
+    if (sessionId) {
+      db.deleteSession(sessionId);
+    }
+    res.json({ ok: true });
+  } catch (error) {
+    console.error('Logout error:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
-  res.json({ ok: true });
 });
 
 app.get('/api/auth/me', async (req, res) => {
-  if (!req.userId) {
-    return res.status(401).json({ error: 'Not authenticated' });
+  try {
+    await ensureDbInitialized();
+    if (!req.userId) {
+      return res.status(401).json({ error: 'Not authenticated' });
+    }
+    await db.db.read();
+    const user = db.db.data.users.find(u => u.id === req.userId);
+    res.json({ user: user || null });
+  } catch (error) {
+    console.error('Auth me error:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
-  await db.db.read();
-  const user = db.db.data.users.find(u => u.id === req.userId);
-  res.json({ user: user || null });
 });
 
 // Teams
-app.get('/api/teams', (req, res) => {
-  const teams = db.listTeams();
-  res.json(teams);
+app.get('/api/teams', async (req, res) => {
+  try {
+    await ensureDbInitialized();
+    const teams = db.listTeams();
+    res.json(teams);
+  } catch (error) {
+    console.error('Teams list error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
-app.post('/api/teams', (req, res) => {
-  const team = db.upsertTeam(req.body);
-  res.status(201).json(team);
+app.post('/api/teams', async (req, res) => {
+  try {
+    await ensureDbInitialized();
+    const team = db.upsertTeam(req.body);
+    res.status(201).json(team);
+  } catch (error) {
+    console.error('Team create error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
 // Matches
-app.get('/api/matches', (req, res) => {
-  res.json(db.listMatches());
+app.get('/api/matches', async (req, res) => {
+  try {
+    await ensureDbInitialized();
+    res.json(db.listMatches());
+  } catch (error) {
+    console.error('Matches list error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
-app.post('/api/matches', (req, res) => {
-  const m = db.insertMatch(req.body);
-  res.status(201).json(m);
+app.post('/api/matches', async (req, res) => {
+  try {
+    await ensureDbInitialized();
+    const m = db.insertMatch(req.body);
+    res.status(201).json(m);
+  } catch (error) {
+    console.error('Match create error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
 // Stats
-app.get('/api/stats/overview', (req, res) => {
-  const overview = db.getOverview();
-  res.json(overview);
+app.get('/api/stats/overview', async (req, res) => {
+  try {
+    await ensureDbInitialized();
+    const overview = db.getOverview();
+    res.json(overview);
+  } catch (error) {
+    console.error('Stats error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
 // Alliances
-app.get('/api/alliances/top', (req, res) => {
-  const limit = Number(req.query.limit || 10);
-  const teams = db.listTeams();
-  const alliances = buildAlliances(teams).slice(0, limit);
-  res.json(alliances);
+app.get('/api/alliances/top', async (req, res) => {
+  try {
+    await ensureDbInitialized();
+    const limit = Number(req.query.limit || 10);
+    const teams = db.listTeams();
+    const alliances = buildAlliances(teams).slice(0, limit);
+    res.json(alliances);
+  } catch (error) {
+    console.error('Alliances error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
-app.post('/api/alliances/calc', (req, res) => {
-  const teamNumbers = req.body.teamNumbers || [];
-  const teams = teamNumbers.map(n => db.getTeamByNumber(n)).filter(Boolean);
-  const [a,b,c] = teams;
-  if (!a || !b || !c) return res.status(400).json({ error: 'Three valid teams required' });
-  const alliances = buildAlliances([a,b,c]);
-  res.json(alliances[0]);
+app.post('/api/alliances/calc', async (req, res) => {
+  try {
+    await ensureDbInitialized();
+    const teamNumbers = req.body.teamNumbers || [];
+    const teams = teamNumbers.map(n => db.getTeamByNumber(n)).filter(Boolean);
+    const [a,b,c] = teams;
+    if (!a || !b || !c) return res.status(400).json({ error: 'Three valid teams required' });
+    const alliances = buildAlliances([a,b,c]);
+    res.json(alliances[0]);
+  } catch (error) {
+    console.error('Alliance calc error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
 // Upload CSV/XLSX
-app.post('/api/import/file', upload.single('file'), (req, res) => {
+app.post('/api/import/file', upload.single('file'), async (req, res) => {
   try {
+    await ensureDbInitialized();
     const filePath = req.file.path;
     const workbook = XLSX.read(fs.readFileSync(filePath));
     const sheet = workbook.SheetNames[0];
@@ -208,8 +279,8 @@ app.post('/api/import/file', upload.single('file'), (req, res) => {
     });
     res.json({ ok: true, inserted });
   } catch (e) {
-    console.error(e);
-    res.status(500).json({ error: 'Import failed' });
+    console.error('Import error:', e);
+    res.status(500).json({ error: 'Import failed: ' + e.message });
   }
 });
 
@@ -220,11 +291,20 @@ app.post('/api/import/google-sheets', async (req, res) => {
 
 // Export serverless handler
 const handler = serverless(app);
+
 module.exports.handler = async (event, context) => {
-  context.callbackWaitsForEmptyEventLoop = false;
-  
-  // Ensure DB is initialized for each request
-  await ensureDbInitialized();
-  
-  return await handler(event, context);
+  try {
+    context.callbackWaitsForEmptyEventLoop = false;
+    return await handler(event, context);
+  } catch (error) {
+    console.error('Handler error:', error);
+    return {
+      statusCode: 500,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        error: 'Internal server error',
+        message: error.message
+      })
+    };
+  }
 };
