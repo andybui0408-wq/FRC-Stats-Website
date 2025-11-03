@@ -29,7 +29,22 @@ if (!fs.existsSync(UPLOADS_DIR)) fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 
 // Init DB
 const db = new Database(path.join(DATA_DIR, 'frc.json'));
-(async () => { await db.migrate(); })();
+
+// Initialize database on function cold start
+let dbInitialized = false;
+async function ensureDbInitialized() {
+  if (!dbInitialized) {
+    try {
+      await db.migrate();
+      dbInitialized = true;
+    } catch (error) {
+      console.error('Database initialization error:', error);
+    }
+  }
+}
+
+// Initialize on module load
+ensureDbInitialized();
 
 // Session middleware
 app.use((req, res, next) => {
@@ -76,20 +91,35 @@ app.post('/api/auth/signup', async (req, res) => {
   res.json({ user, sessionId: session.id });
 });
 
-app.post('/api/auth/login', (req, res) => {
-  const { email } = req.body;
-  
-  if (!email || !email.endsWith('@ssis.edu.vn')) {
-    return res.status(400).json({ error: 'Only @ssis.edu.vn email addresses are allowed' });
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    const { email } = req.body;
+    
+    if (!email || !email.endsWith('@ssis.edu.vn')) {
+      return res.status(400).json({ error: 'Only @ssis.edu.vn email addresses are allowed' });
+    }
+    
+    // Ensure database is ready
+    await db.db.read();
+    
+    let user = db.getUserByEmail(email);
+    if (!user) {
+      user = db.createUser(email, '');
+      if (!user) {
+        return res.status(500).json({ error: 'Failed to create user' });
+      }
+    }
+    
+    const session = db.createSession(user.id);
+    if (!session) {
+      return res.status(500).json({ error: 'Failed to create session' });
+    }
+    
+    res.json({ user, sessionId: session.id });
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({ error: 'Internal server error: ' + error.message });
   }
-  
-  let user = db.getUserByEmail(email);
-  if (!user) {
-    user = db.createUser(email, '');
-  }
-  
-  const session = db.createSession(user.id);
-  res.json({ user, sessionId: session.id });
 });
 
 app.post('/api/auth/logout', (req, res) => {
@@ -192,5 +222,9 @@ app.post('/api/import/google-sheets', async (req, res) => {
 const handler = serverless(app);
 module.exports.handler = async (event, context) => {
   context.callbackWaitsForEmptyEventLoop = false;
+  
+  // Ensure DB is initialized for each request
+  await ensureDbInitialized();
+  
   return await handler(event, context);
 };

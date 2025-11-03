@@ -119,11 +119,22 @@
                     body: JSON.stringify({ email })
                 });
                 
-                const data = await res.json();
+                // Check if response is actually JSON
+                let data;
+                try {
+                    data = await res.json();
+                } catch (jsonError) {
+                    const text = await res.text();
+                    errorDiv.textContent = `Server error: ${res.status} - ${text || 'Unknown error'}`;
+                    errorDiv.style.display = 'block';
+                    console.error('Login error:', res.status, text);
+                    return;
+                }
                 
                 if (!res.ok) {
-                    errorDiv.textContent = data.error || 'Login failed';
+                    errorDiv.textContent = data.error || `Login failed (${res.status})`;
                     errorDiv.style.display = 'block';
+                    console.error('Login failed:', data);
                     return;
                 }
                 
@@ -134,8 +145,9 @@
                 // Redirect to main app
                 window.location.href = './index.html';
             } catch (error) {
-                errorDiv.textContent = 'Connection error. Please try again.';
+                errorDiv.textContent = `Connection error: ${error.message}. Check console for details.`;
                 errorDiv.style.display = 'block';
+                console.error('Login connection error:', error);
             }
         });
     </script>
