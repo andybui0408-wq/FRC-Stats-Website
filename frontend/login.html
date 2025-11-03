@@ -31,53 +31,34 @@
             text-align: center;
             margin-bottom: 2rem;
         }
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: #333;
-            font-weight: 600;
-        }
-        .form-group input {
-            width: 100%;
-            padding: 0.75rem;
-            border: 2px solid #ddd;
-            border-radius: 5px;
-            font-size: 1rem;
-        }
-        .form-group input:focus {
-            outline: none;
-            border-color: #003366;
-        }
-        .error-message {
-            color: #dc3545;
-            margin-top: 0.5rem;
-            font-size: 0.9rem;
-        }
-        .btn-login {
-            width: 100%;
-            padding: 1rem;
-            background-color: #003366;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        .btn-login:hover {
-            background-color: #004d99;
-        }
-        .ssis-logo {
+        .disabled-notice {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            padding: 2rem;
             text-align: center;
             margin-bottom: 2rem;
         }
-        .ssis-logo img {
-            max-width: 150px;
-            height: auto;
+        .disabled-notice h2 {
+            color: #856404;
+            margin-bottom: 1rem;
+        }
+        .disabled-notice p {
+            color: #856404;
+            margin-bottom: 1rem;
+        }
+        .btn-redirect {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background-color: #003366;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        .btn-redirect:hover {
+            background-color: #004d99;
         }
     </style>
 </head>
@@ -88,68 +69,17 @@
                 <h1 style="color: #003366; margin: 0;">SSIS</h1>
                 <p style="color: #666; margin-top: 0.5rem;">FRC Scouting Dashboard</p>
             </div>
-            <h1>Welcome Back</h1>
-            <p>Please sign in with your SSIS email</p>
-            <form id="login-form">
-                <div class="form-group">
-                    <label for="email">SSIS Email Address</label>
-                    <input type="email" id="email" name="email" placeholder="your.name@ssis.edu.vn" required>
-                    <div id="error-message" class="error-message" style="display: none;"></div>
-                </div>
-                <button type="submit" class="btn-login">Sign In / Sign Up</button>
-            </form>
+            
+            <div class="disabled-notice">
+                <h2>🔒 Authentication Temporarily Disabled</h2>
+                <p><strong>Login functionality is currently disabled for testing purposes.</strong></p>
+                <p>The main dashboard is accessible without authentication.</p>
+            </div>
+            
+            <div style="text-align: center;">
+                <a href="./index.html" class="btn-redirect">Go to Dashboard →</a>
+            </div>
         </div>
     </div>
-    <script>
-        document.getElementById('login-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            const errorDiv = document.getElementById('error-message');
-            
-            if (!email.endsWith('@ssis.edu.vn')) {
-                errorDiv.textContent = 'Only @ssis.edu.vn email addresses are allowed';
-                errorDiv.style.display = 'block';
-                return;
-            }
-            
-            try {
-                const res = await fetch('/api/auth/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email })
-                });
-                
-                // Check if response is actually JSON
-                let data;
-                try {
-                    data = await res.json();
-                } catch (jsonError) {
-                    const text = await res.text();
-                    errorDiv.textContent = `Server error: ${res.status} - ${text || 'Unknown error'}`;
-                    errorDiv.style.display = 'block';
-                    console.error('Login error:', res.status, text);
-                    return;
-                }
-                
-                if (!res.ok) {
-                    errorDiv.textContent = data.error || `Login failed (${res.status})`;
-                    errorDiv.style.display = 'block';
-                    console.error('Login failed:', data);
-                    return;
-                }
-                
-                // Store session
-                localStorage.setItem('sessionId', data.sessionId);
-                localStorage.setItem('user', JSON.stringify(data.user));
-                
-                // Redirect to main app
-                window.location.href = './index.html';
-            } catch (error) {
-                errorDiv.textContent = `Connection error: ${error.message}. Check console for details.`;
-                errorDiv.style.display = 'block';
-                console.error('Login connection error:', error);
-            }
-        });
-    </script>
 </body>
 </html>

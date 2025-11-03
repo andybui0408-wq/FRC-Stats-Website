@@ -11,14 +11,18 @@ class FRCScoutingDashboard {
     }
 
     async init() {
+        // AUTHENTICATION DISABLED FOR TESTING
+        // TODO: Re-enable authentication later
+        /*
         // Check authentication first
         if (!await this.checkAuth()) {
             window.location.href = '/login.html';
             return;
         }
+        */
 
         this.setupEventListeners();
-        this.setupAuthUI();
+        // this.setupAuthUI(); // Commented out - no auth UI needed for testing
         await this.bootstrapFromBackend();
         this.updateDashboard();
     }
@@ -136,9 +140,10 @@ class FRCScoutingDashboard {
 
     async bootstrapFromBackend() {
         try {
-            const res = await fetch('/api/teams', {
+            // AUTHENTICATION DISABLED - removed session header
+            const res = await fetch('/api/teams' /* , {
                 headers: { 'x-session-id': this.sessionId }
-            });
+            } */);
             if (res.ok) {
                 this.teams = await res.json();
             } else {
@@ -483,9 +488,10 @@ class FRCScoutingDashboard {
         const file = fileInput.files[0];
         const form = new FormData();
         form.append('file', file);
+        // AUTHENTICATION DISABLED - removed session header
         const res = await fetch('/api/import/file', { 
             method: 'POST', 
-            headers: { 'x-session-id': this.sessionId },
+            // headers: { 'x-session-id': this.sessionId },
             body: form 
         });
         if (!res.ok) {
