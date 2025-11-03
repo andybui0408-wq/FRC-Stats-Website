@@ -1,24 +1,26 @@
 [build]
-  command = "npm install && npm run build"
+  command = "npm install"
   publish = "."
+  functions = "netlify/functions"
 
 [build.environment]
   NODE_VERSION = "18"
-  PORT = "3000"
 
+# Redirect API calls to serverless function (this is the correct pattern)
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/server"
+  status = 200
+  force = true
+
+# SPA routing - serve index.html for all non-API routes
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
-  force = false
-  conditions = {Role = ["admin"]}
+  conditions = {Role = ["*"]}
 
-# For Netlify Functions (if converting to serverless)
-# [functions]
-#   directory = "netlify/functions"
-#   node_bundler = "esbuild"
-
-# Ensure static files are served
+# Headers for security
 [[headers]]
   for = "/*"
   [headers.values]
@@ -26,3 +28,10 @@
     X-XSS-Protection = "1; mode=block"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
+
+# Allow CORS for API
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Headers = "Content-Type, x-session-id"
